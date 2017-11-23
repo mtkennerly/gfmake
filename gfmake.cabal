@@ -28,7 +28,7 @@ library
       src
   ghc-options: -Wall
   build-depends:
-      base
+      base < 5.0
     , MissingH
     , split
   exposed-modules:
@@ -42,7 +42,7 @@ executable gfmake
       app
   ghc-options: -Wall
   build-depends:
-      base
+      base < 5.0
     , MissingH
     , split
     , gfmake
@@ -55,7 +55,7 @@ test-suite spec
   hs-source-dirs:
       test
   build-depends:
-      base
+      base < 5.0
     , MissingH
     , split
     , gfmake

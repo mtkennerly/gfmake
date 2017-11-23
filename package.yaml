@@ -1,6 +1,7 @@
 # Dependency version ranges are provided as a reference, but not enabled,
 # to avoid locking users into old distributions unnecessarily.
 # Ranges will be activated as relevant breaking changes are discovered.
+# The exception is `base`, since `stack sdist` requires an upper bound.
 
 name: gfmake
 version: 1.0.0
@@ -14,7 +15,7 @@ data-files: README.md
 github: mtkennerly/gfmake
 
 dependencies:
-  - base  # >= 4.7.0 && < 5.0
+  - base < 5.0  # >= 4.5.0
   - MissingH  # >= 1.4.0 && < 1.5
   - split  # >= 0.2.0 && < 0.3
 
