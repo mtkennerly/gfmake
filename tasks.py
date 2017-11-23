@@ -23,4 +23,4 @@ def style(ctx):
         for filename in fnmatch.filter(filenames, "*.hs")
     ]
 
-    ctx.run("stack exec -- hlint src && stylish-haskell {} -i".format(" ".join(source_files)))
+    ctx.run("stack exec -- hlint app src test && stylish-haskell {} -i".format(" ".join(source_files)))
