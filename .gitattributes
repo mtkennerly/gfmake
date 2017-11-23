@@ -1,0 +1,9 @@
+* text=auto
+
+*.cabal text
+*.hs text
+*.md text
+*.py text
+*.txt text
+*.yaml text
+cabal.config text

@@ -1,0 +1,81 @@
+#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#
+#$#$#$#$#$#$#$#$#$#$                                       $#$#$#$#$#$#$#$#$#$#
+#$#$#   [01'00]   ---              Header 2               ---   [01'00]   #$#$#
+#$#$#$#$#$#$#$#$#$#$                                       $#$#$#$#$#$#$#$#$#$#
+#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#
+
+#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#
+#$#$#$#$#$#$#$                               $#$#$#$#$#$#$#
+#$# [01'01] ---           Header 3          --- [01'01] #$#
+#$#$#$#$#$#$#$                               $#$#$#$#$#$#$#
+#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#
+
+#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#
+#$#$#$#$#$#$#$                               $#$#$#$#$#$#$#
+#$# [01'02] ---          Header 3:          --- [01'02] #$#
+#$#$#                 Multiple Lines                  #$#$#
+#$#$#$#$#$#$#$                               $#$#$#$#$#$#$#
+#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#
+
+___________________________________________________________
+-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
+===========================================================
+                     _===============_
+                     \_  Header 3b  _/
+                      ===============
+
+#$#$#$#$#$#$#$#$
+$#  Header 4  #$
+#$#$#$#$#$#$#$#$
+
+   [ Header 5 ]
+* - This is original narration for events. If it is long enough, then it is
+    indented after the hyphen.
+
+    There may also be multiple paragraphs of narration.
+
+Speaker   : This is text or speech directly from the game. The speaker ID
+            is always padded with spaces to at least 10 characters.
+
+            This may also have multiple lines.
+
+Long Name Here: If the speaker ID is longer than 10 characters, then the
+                indentation is simply shifted over.
+
+Narrated  :   * - Narration can occur inside of a speaker block.
+
+            Speech occurs at normal indentation.
+
+              * - Narration is indented an extra 2 spaces.
+
+
+#$#$#$#$#$#$#$#$#$#$#$#$#$  (in some rare cases)
+$#  Header 4 Annotated  #$  (an annotation will be present)
+#$#$#$#$#$#$#$#$#$#$#$#$#$  (middle line is default, but all three are possible)
+
+This is ignored because it doesn't conform to any particular script syntax.
+
+Condition :{A} This is said under condition A.
+           {B} This is said under condition B.
+                 * - It may include narration as well.
+          *{C} Idiosyncratic marker.
+
+-----------------------------------------------------------
+     -(Option 1)
+Speaker    : This is the response to choosing one option.
+
+    --(Option 1.1)
+Speaker    : This option is available if you choose Option 1.
+
+------(Six)
+Speaker    : The hyphens continue increasing...
+
+-----=(Seven)
+Speaker    : ...until they wrap around to an equal sign.
+
+======(Twelve)
+Speaker    : The maximum depth is 12 nested options.
+
+     -(Option 2)
+Speaker    : This is the alternative to Option 1.
+-----------------------------------------------------------

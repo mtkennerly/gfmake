@@ -1,0 +1,43 @@
+# Dependency version ranges are provided as a reference, but not enabled,
+# to avoid locking users into old distributions unnecessarily.
+# Ranges will be activated as relevant breaking changes are discovered.
+
+name: gfmake
+version: 1.0.0
+synopsis: Convert game scripts to GameFAQs Markup.
+description: See the README
+category: Parsing
+author: Matthew T. Kennerly
+maintainer: mtkennerly@gmail.com
+license: MIT
+data-files: README.md
+github: mtkennerly/gfmake
+
+dependencies:
+  - base  # >= 4.7.0 && < 5.0
+  - MissingH  # >= 1.4.0 && < 1.5
+  - split  # >= 0.2.0 && < 0.3
+
+library:
+  source-dirs: src
+  ghc-options: -Wall
+
+executables:
+  gfmake:
+    main: Main.hs
+    source-dirs:
+      - app
+    ghc-options: -Wall
+    dependencies:
+      - gfmake
+      - optparse-applicative  # >= 0.13.0 && < 0.15
+
+tests:
+  spec:
+    main: Spec.hs
+    source-dirs:
+      - test
+    dependencies:
+      - gfmake
+      - hspec  # == 2.*
+      - HUnit  # >= 1.5.0 && < 1.6
