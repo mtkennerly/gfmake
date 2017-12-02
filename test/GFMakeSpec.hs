@@ -217,7 +217,12 @@ spec =
     it "converts brace option phrases with inner parentheses" $
       convertScript "     -{(Con(tains) (( parentheses}" `shouldBeMarkup` "*1. (Con(tains) (( parentheses"
 
-    it "omits lines with unrecognized syntax" $
-      convertScript "* - Narration.\nUnknown\n* - More narration." `shouldBeMarkup` "Narration.\nMore narration."
+    it "converts comments" $
+      convertScript "\nOne.\nTwo.\n\nThree.\n" `shouldBeMarkup` "; One.\n; Two.\n; Three."
+    it "converts comments between other elements" $
+      convertScript "* - One.\nTwo.\n* - Three." `shouldBeMarkup` "One.\n; Two.\nThree."
+    it "trims would-be comments through the last special character" $
+      convertScript "* - One.\nWould-be\n* - Two." `shouldBeMarkup` "One.\n; be\nTwo."
+
     it "handles empty files" $
       convertScript "" `shouldBe` ";format:gf-markup\n"

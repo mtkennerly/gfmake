@@ -1,3 +1,5 @@
+This is a freeform comment without any special characters.
+
 #$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#$#
 #$#$#$#$#$#$#$#$#$#$                                       $#$#$#$#$#$#$#$#$#$#
 #$#$#   [01'00]   ---              Header 2               ---   [01'00]   #$#$#
@@ -52,8 +54,6 @@ Narrated  :   * - Narration can occur inside of a speaker block.
 #$#$#$#$#$#$#$#$#$#$#$#$#$  (in some rare cases)
 $#  Header 4 Annotated  #$  (an annotation will be present)
 #$#$#$#$#$#$#$#$#$#$#$#$#$  (middle line is default, but all three are possible)
-
-This is ignored because it doesn't conform to any particular script syntax.
 
 Condition :{A} This is said under condition A.
            {B} This is said under condition B.

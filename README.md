@@ -41,6 +41,8 @@ This is the output for sample1.txt:
 ```
 ;format:gf-markup
 
+; This is a freeform comment without any special characters.
+
 ==Header 2==
 ===Header 3===
 ===Header 3: Multiple Lines===
@@ -53,7 +55,7 @@ This is original narration for events. If it is long enough, then it is indented
 | Long Name Here | If the speaker ID is longer than 10 characters, then the indentation is simply shifted over. |
 | Narrated | * - Narration can occur inside of a speaker block. Speech occurs at normal indentation. * - Narration is indented an extra 2 spaces. |
 
-====Header 4 Annotated  |  (an annotation will be present) / (in some rare cases) / (middle line is default, but all three are possible)====
+====Header 4 Annotated | (an annotation will be present) / (in some rare cases) / (middle line is default, but all three are possible)====
 | Condition | {A} This is said under condition A. {B} This is said under condition B. * - It may include narration as well. *{C} Idiosyncratic marker. |
 %
 *1. Option 1
@@ -77,11 +79,6 @@ This is original narration for events. If it is long enough, then it is indented
 ```
 
 ## To-do
-
-* Any lines without a recognized syntax in the old format are ignored,
-  such as freeform comments. It would be useful to preserve a subset of
-  these as markup comments, but it would need to be selective enough to
-  avoid introducing significant clutter.
 
 * The plus-formatting for h3b headers doesn't have any significance in GameFAQs
   Markup and is just to highlight them for manual cleanup, since there aren't

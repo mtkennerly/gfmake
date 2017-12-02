@@ -15,6 +15,7 @@ import Text.Parsec
   ( anyChar
   , char
   , endOfLine
+  , lookAhead
   , many
   , many1
   , manyTill
@@ -43,6 +44,7 @@ data Element
   | OptionDelim
   | Spacer
   | MarkupFlag
+  | Comment String
   | NoOp
   deriving (Eq, Show)
 
@@ -72,6 +74,7 @@ serializeElement (Option l e)  = "\n*" ++ show l ++ ". " ++ e
 serializeElement OptionDelim   = "\n%"
 serializeElement Spacer        = "\n"
 serializeElement MarkupFlag    = ";format:gf-markup\n"
+serializeElement (Comment e)   = "\n; " ++ e
 serializeElement NoOp          = ""
 
 responsePrefixes :: [String]
@@ -116,6 +119,7 @@ elemsRule = many $
   <|> optionRule
   <|> narrationRule
   <|> speechRule
+  <|> commentRule
   <|> noOpRule
 
 h2Rule :: Parser Element
@@ -192,6 +196,13 @@ speechRule = try $ do
   _ <- char ':'
   spoken <- sepBy (many1 (noneOf "\r\n")) (try $ many1 endOfLine >> string "      " >> many (char ' '))
   return $ Speech (strip name) (unwords $ map strip spoken)
+
+commentRule :: Parser Element
+commentRule = try $ do
+  _ <- many endOfLine >> lookAhead (noneOf " ")
+  t <- many1 $ noneOf "\r\n*#$-_=:"
+  _ <- endOfLine
+  return $ Comment $ strip t
 
 noOpRule :: Parser Element
 noOpRule = try $ do
