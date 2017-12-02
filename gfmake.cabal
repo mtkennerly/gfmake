@@ -29,8 +29,7 @@ library
   ghc-options: -Wall
   build-depends:
       base < 5.0
-    , MissingH
-    , split
+    , parsec
   exposed-modules:
       GFMake
       GFMake.Internal
@@ -43,8 +42,7 @@ executable gfmake
   ghc-options: -Wall
   build-depends:
       base < 5.0
-    , MissingH
-    , split
+    , parsec
     , gfmake
     , optparse-applicative
   default-language: Haskell2010
@@ -56,8 +54,7 @@ test-suite spec
       test
   build-depends:
       base < 5.0
-    , MissingH
-    , split
+    , parsec
     , gfmake
     , hspec
     , HUnit

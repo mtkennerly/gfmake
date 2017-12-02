@@ -79,7 +79,7 @@ h4AnnoLow = unlines
   , "#$#$#$#$#$#  (low)"
   ]
 
-h5 = "   [ Header 5 ]"
+h5 = "\n   [ Header 5 ]"
 
 options = unlines
   [ "-----------------------------------------------------------"
@@ -169,13 +169,13 @@ spec =
     it "converts h4 after a non-header element" $
       convertScript ("* - Example.\n\n" ++ h4) `shouldBeMarkup` "Example.\n\n====Header 4===="
     it "converts h4 with annotations on all three lines" $
-      convertScript h4Anno `shouldBeMarkup` "====H4A  |  (mid) / (high) / (low)===="
+      convertScript h4Anno `shouldBeMarkup` "====H4A | (mid) / (high) / (low)===="
     it "converts h4 with an annotation on the top line" $
-      convertScript h4AnnoHigh `shouldBeMarkup` "====H4A / (high)===="
+      convertScript h4AnnoHigh `shouldBeMarkup` "====H4A | (high)===="
     it "converts h4 with an annotation on the middle line" $
-      convertScript h4AnnoMid `shouldBeMarkup` "====H4A  |  (mid)===="
+      convertScript h4AnnoMid `shouldBeMarkup` "====H4A | (mid)===="
     it "converts h4 with an annotation on the bottom line" $
-      convertScript h4AnnoLow `shouldBeMarkup` "====H4A / (low)===="
+      convertScript h4AnnoLow `shouldBeMarkup` "====H4A | (low)===="
 
     it "converts h5" $
       convertScript h5 `shouldBeMarkup` "=====Header 5====="
@@ -212,8 +212,10 @@ spec =
       convertScript "-=====(A)" `shouldBeMarkup` "*11. A"
     it "converts options at level 12" $
       convertScript "======(A)" `shouldBeMarkup` "*12. A"
-    it "converts option phrases with inner parentheses" $
-      convertScript "     -((Con(tains) (( parentheses)" `shouldBeMarkup` "*1. (Con(tains) (( parentheses"
+    it "converts parenthetical option phrases with inner braces" $
+      convertScript "     -({Con{tains} {{ braces)" `shouldBeMarkup` "*1. {Con{tains} {{ braces"
+    it "converts brace option phrases with inner parentheses" $
+      convertScript "     -{(Con(tains) (( parentheses}" `shouldBeMarkup` "*1. (Con(tains) (( parentheses"
 
     it "omits lines with unrecognized syntax" $
       convertScript "* - Narration.\nUnknown\n* - More narration." `shouldBeMarkup` "Narration.\nMore narration."

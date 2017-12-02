@@ -1,35 +1,43 @@
 module GFMake.Internal where
 
 import Control.Applicative
-  ( liftA2
+  ( (<|>)
   )
 import Data.List
   ( intercalate
-  , isInfixOf
-  , isPrefixOf
-  , isSuffixOf
+  )
+import Data.Maybe
+  ( catMaybes
+  , fromMaybe
   )
 
-import Data.List.Split
-  ( splitOn
+import Text.Parsec
+  ( anyChar
+  , char
+  , endOfLine
+  , many
+  , many1
+  , manyTill
+  , noneOf
+  , oneOf
+  , optionMaybe
+  , parse
+  , sepBy
+  , spaces
+  , string
+  , try
   )
-import Data.String.Utils
-  ( endswith
-  , replace
-  , split
-  , strip
+import Text.Parsec.String
+  ( Parser
   )
 
 data Element
   = Narration String
   | Speech String String  -- ^ Speaker name, then spoken words.
-  | Cont String
   | Header2 String
   | Header3 String
-  | Header3Cont String
   | Header3B String
   | Header4 String
-  | Header4Anno String
   | Header5 String
   | Option Int String  -- ^ Nesting level, then option phrase.
   | OptionDelim
@@ -37,17 +45,6 @@ data Element
   | MarkupFlag
   | NoOp
   deriving (Eq, Show)
-
-squeezeElements :: [Element] -> [Element]
-squeezeElements []                           = []
-squeezeElements [x]                          = [x]
-squeezeElements (Narration x:Cont y:xs)      = squeezeElements (Narration (x ++ " " ++ y) : xs)
-squeezeElements (Speech who what:Cont y:xs)  = squeezeElements (Speech who (what ++ " " ++ y) : xs)
-squeezeElements (x:Cont _:xs)                = x : squeezeElements xs
-squeezeElements (Header3 x:Header3Cont y:xs) = squeezeElements (Header3 (x ++ " " ++ y) : xs)
-squeezeElements (Header4Anno x:Header4 y:xs) = squeezeElements (Header4 (y ++ " / " ++ x) : xs)
-squeezeElements (Header4 x:Header4Anno y:xs) = squeezeElements (Header4 (x ++ " / " ++ y) : xs)
-squeezeElements (x:y:xs)                     = x : squeezeElements (y : xs)
 
 padElements :: [Element] -> [Element]
 padElements []                            = []
@@ -60,27 +57,6 @@ padElements (x:y:xs)
   | not (isHeader x) && isHeader y = x : Spacer : padElements (y : xs)
   | otherwise                      = x : padElements (y : xs)
 
-parseLines :: [String] -> [Element]
-parseLines = filter (/= NoOp) . map parseLine
-
-parseLine :: String -> Element
-parseLine line
-  | isH2 l          = Header2 (h2Or3Text l)
-  | isH3 l          = Header3 (h2Or3Text l)
-  | isH3Cont l      = Header3Cont (h3ContText l)
-  | isH3B l         = Header3B (h3bText l)
-  | isH4 l          = Header4 (h4Text l)
-  | isH4Anno l      = Header4Anno (h4Anno l)
-  | isH5 l          = Header5 (h5Text l)
-  | isOptionDelim l = OptionDelim
-  | isOption l      = Option (optionLevel line) (optionText line)
-  | isCont line     = Cont l
-  | isNarration l   = Narration (strip (drop 3 l))
-  | isSpeech l      = uncurry Speech (splitOnce ":" l)
-  | otherwise       = NoOp
-  where
-    l = strip line
-
 serializeElements :: [Element] -> String
 serializeElements = concatMap serializeElement
 
@@ -91,91 +67,18 @@ serializeElement (Header3B e)  = "\n===++" ++ e ++ "++==="
 serializeElement (Header4 e)   = "\n====" ++ e ++ "===="
 serializeElement (Header5 e)   = "\n=====" ++ e ++ "====="
 serializeElement (Narration e) = "\n" ++ e
-serializeElement (Speech n s)  = "\n| " ++ strip n ++ " | " ++ strip s ++ " |"
+serializeElement (Speech n s)  = "\n| " ++ n ++ " | " ++ s ++ " |"
 serializeElement (Option l e)  = "\n*" ++ show l ++ ". " ++ e
 serializeElement OptionDelim   = "\n%"
 serializeElement Spacer        = "\n"
 serializeElement MarkupFlag    = ";format:gf-markup\n"
-serializeElement _             = ""
-
-isNarration :: String -> Bool
-isNarration = (== "* -") . take 3
-
-isSpeech :: String -> Bool
-isSpeech = elem ':'
-
-h2Or3Text :: String -> String
-h2Or3Text = strip . (!! 1) . splitOn "---"
-
-h3ContText :: String -> String
-h3ContText = strip . drop 5 . reverse . drop 5 . reverse
-
-h3bText :: String -> String
-h3bText = drop 4 . reverse . drop 4 . reverse
-
-h4Text :: String -> String
-h4Text = strip . dropSepIfNotAnnotated . replace "#$" "|" . replace "$#" ""
-  where
-    dropSepIfNotAnnotated x
-      | endswith "|" x = replace "|" "" x
-      | otherwise      = x
-
-h4Anno :: String -> String
-h4Anno = strip . dropWhile (`elem` ['#', '$'])
-
-h5Text :: String -> String
-h5Text = strip . drop 1 . reverse . drop 1 . reverse
-
-optionText :: String -> String
-optionText = drop 7 . reverse . drop 1 . reverse
-
-isH2 :: String -> Bool
-isH2 = isPrefixOf "#$#$#   ["
-
-isH3 :: String -> Bool
-isH3 = isPrefixOf "#$# ["
-
-isH3Cont :: String -> Bool
-isH3Cont = isPrefixOf "#$#$#    "
-
-isH3B :: String -> Bool
-isH3B x = "\\_" `isPrefixOf` x && "_/" `isSuffixOf` x
-
-isH4 :: String -> Bool
-isH4 = isPrefixOf "$#  "
-
--- Identify h4 lines with some trailing text afterward, but ignore false
--- positives from the right side of h2 and h3.
-isH4Anno :: String -> Bool
-isH4Anno line = "#$#$#$#$#  " `isInfixOf` l || "$#$#$#$#$  " `isInfixOf` l && not (" $#$#$#$#$#$#$#" `isInfixOf` l)
-  where
-    l = strip line
-
-isH5 :: String -> Bool
-isH5 s = isPrefixOf "[ " s && isSuffixOf " ]" s
-
-isOption :: String -> Bool
-isOption l = any (`isPrefixOf` l) responsePrefixes
-
-isOptionDelim :: String -> Bool
-isOptionDelim = (== replicate 59 '-')
-
-isCont :: String -> Bool
-isCont = liftA2 (&&) (" " `isPrefixOf`) (not . isHeaderFluff)
-
-isHeaderFluff :: String -> Bool
-isHeaderFluff = ("_=======" `isInfixOf`)
+serializeElement NoOp          = ""
 
 responsePrefixes :: [String]
 responsePrefixes = [m ++ b | m <- markers, b <- braces]
   where
     markers = [replicate n '-' | n <- [1..6]] ++ [replicate (6 - n) '-' ++ replicate n '=' | n <- [1..6]]
     braces  = ["(", "{"]
-
-splitOnce :: String -> String -> (String, String)
-splitOnce by xs = (head once, intercalate ":" $ tail once)
-  where
-    once = split by xs
 
 optionLevel :: String -> Int
 optionLevel s = countHyphens + countEquals * 2
@@ -185,10 +88,112 @@ optionLevel s = countHyphens + countEquals * 2
     countEquals  = length $ filter (== '=') marker
 
 isHeader :: Element -> Bool
-isHeader (Header2 _)     = True
-isHeader (Header3 _)     = True
-isHeader (Header3B _)    = True
-isHeader (Header3Cont _) = True
-isHeader (Header4 _)     = True
-isHeader (Header5 _)     = True
-isHeader _               = False
+isHeader (Header2 _)  = True
+isHeader (Header3 _)  = True
+isHeader (Header3B _) = True
+isHeader (Header4 _)  = True
+isHeader (Header5 _)  = True
+isHeader _            = False
+
+strip :: String -> String
+strip = reverse . lstrip . reverse . lstrip
+  where
+    lstrip = dropWhile (`elem` " \n\r\t")
+
+parseElements :: String -> [Element]
+parseElements s = case parse elemsRule "(script)" s of
+  Right xs -> filter (/= NoOp) xs
+  Left _   -> []
+
+elemsRule :: Parser [Element]
+elemsRule = many $
+  h2Rule
+  <|> h3Rule
+  <|> h3BRule
+  <|> h4Rule
+  <|> h5Rule
+  <|> optionDelimRule
+  <|> optionRule
+  <|> narrationRule
+  <|> speechRule
+  <|> noOpRule
+
+h2Rule :: Parser Element
+h2Rule = try $ do
+  _ <- string "#$#$# "
+  _ <- manyTill anyChar (string "---")
+  t <- manyTill anyChar (string "---")
+  return $ Header2 $ strip t
+
+h3Rule :: Parser Element
+h3Rule = try $ do
+  _ <- string "#$# "
+  _ <- manyTill anyChar (string "---")
+  t <- manyTill anyChar (string "---")
+  _ <- manyTill anyChar endOfLine
+  t2 <- optionMaybe (try $ string "#$#$#" >> manyTill (noneOf "#$") (string "#$#$#"))
+  let
+    t' = strip t
+    t2' = strip (fromMaybe "" t2)
+    sep = case t2 of
+      Just _  -> " "
+      Nothing -> ""
+  return $ Header3 $ t' ++ sep ++ t2'
+
+h3BRule :: Parser Element
+h3BRule = try $ do
+  _ <- spaces
+  t <- string "\\_" >> manyTill anyChar (string "_/")
+  return $ Header3B $ strip t
+
+h4Rule :: Parser Element
+h4Rule = try $ do
+  _ <- many $ oneOf "#$"
+  high <- optionMaybe (manyTill anyChar (char '\n'))
+  t <- string "$#" >> manyTill anyChar (string "#$")
+  mid <- optionMaybe (manyTill anyChar (char '\n'))
+  _ <- many $ oneOf "#$"
+  low <- optionMaybe (manyTill anyChar (char '\n'))
+  let
+    annotations = filter (not . null) $ map strip $ catMaybes [mid, high, low]
+    t' = strip t
+    sep = if null annotations
+      then ""
+      else " | "
+  return $ Header4 $ t' ++ sep ++ intercalate " / " annotations
+
+h5Rule :: Parser Element
+h5Rule = try $ do
+  _ <- endOfLine >> string "   ["
+  t <- manyTill (noneOf "\r\n") (char ']')
+  return $ Header5 $ strip t
+
+optionDelimRule :: Parser Element
+optionDelimRule = try $ do
+  _ <- string (replicate 59 '-')
+  return OptionDelim
+
+optionRule :: Parser Element
+optionRule = try $ do
+  _ <- spaces
+  level <- many1 $ oneOf "-="
+  phrase <- try (char '(' >> manyTill anyChar (char ')')) <|> (char '{' >> manyTill anyChar (char '}'))
+  return $ Option (optionLevel level) (strip phrase)
+
+narrationRule :: Parser Element
+narrationRule = try $ do
+  _ <- string "* - "
+  ts <- sepBy (many1 (noneOf "\r\n")) (try $ many1 endOfLine >> string "    ")
+  return $ Narration (unwords $ map strip ts)
+
+speechRule :: Parser Element
+speechRule = try $ do
+  name <- many1 $ noneOf ":\n\r"
+  _ <- char ':'
+  spoken <- sepBy (many1 (noneOf "\r\n")) (try $ many1 endOfLine >> string "      " >> many (char ' '))
+  return $ Speech (strip name) (unwords $ map strip spoken)
+
+noOpRule :: Parser Element
+noOpRule = try $ do
+  _ <- anyChar
+  return NoOp

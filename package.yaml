@@ -16,8 +16,7 @@ github: mtkennerly/gfmake
 
 dependencies:
   - base < 5.0  # >= 4.5.0
-  - MissingH  # >= 1.4.0 && < 1.5
-  - split  # >= 0.2.0 && < 0.3
+  - parsec  # == 3.*
 
 library:
   source-dirs: src
