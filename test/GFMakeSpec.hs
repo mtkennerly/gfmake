@@ -110,13 +110,13 @@ spec =
       convertScript "S         : W.\n* - N." `shouldBeMarkup` "| S | W. |\n\nN."
 
     it "converts speech with one condition" $
-      convertScript "S         :{A} Foo." `shouldBeMarkup` "| S | A | Foo. |"
+      convertScript "S         :{A} Foo." `shouldBeMarkup` "|-1 S | A | Foo. |"
     it "converts speech with one condition containing braces" $
-      convertScript "S         :{A} F{o}o." `shouldBeMarkup` "| S | A | F{o}o. |"
+      convertScript "S         :{A} F{o}o." `shouldBeMarkup` "|-1 S | A | F{o}o. |"
     it "converts speech with one condition over multiple lines" $
-      convertScript "S         :{A} Foo,\n               bar." `shouldBeMarkup` "| S | A | Foo, bar. |"
+      convertScript "S         :{A} Foo,\n               bar." `shouldBeMarkup` "|-1 S | A | Foo, bar. |"
     it "converts speech with one condition and a special marker" $
-      convertScript "S         :*{A} Foo." `shouldBeMarkup` "| S | *A | Foo. |"
+      convertScript "S         :*{A} Foo." `shouldBeMarkup` "|-1 S | *A | Foo. |"
     it "converts speech with many conditions" $
       convertScript "S         :{A} Foo.\n           {B} Bar." `shouldBeMarkup` "|-2 S | A | Foo. |\n  | B | Bar. |"
     it "converts speech with many conditions over multiple lines" $ do
@@ -133,6 +133,73 @@ spec =
           , "  | *C | Case C. |"
           ]
       convertScript input `shouldBeMarkup` output
+    it "converts speech with 10 conditions using hexadecimal" $ do
+      let
+        input = unlines
+          [ "Condition :{1} 1."
+          , "           {2} 2."
+          , "           {3} 3."
+          , "           {4} 4."
+          , "           {5} 5."
+          , "           {6} 6."
+          , "           {7} 7."
+          , "           {8} 8."
+          , "           {9} 9."
+          , "           {10} 10."
+          ]
+        output = init $ unlines
+          [ "|-a Condition | 1 | 1. |"
+          , "  | 2 | 2. |"
+          , "  | 3 | 3. |"
+          , "  | 4 | 4. |"
+          , "  | 5 | 5. |"
+          , "  | 6 | 6. |"
+          , "  | 7 | 7. |"
+          , "  | 8 | 8. |"
+          , "  | 9 | 9. |"
+          , "  | 10 | 10. |"
+          ]
+      convertScript input `shouldBeMarkup` output
+    it "converts speech with 16 conditions by spliting into multiple elements" $ do
+      let
+        input = unlines
+          [ "Condition :{1} 1."
+          , "           {2} 2."
+          , "           {3} 3."
+          , "           {4} 4."
+          , "           {5} 5."
+          , "           {6} 6."
+          , "           {7} 7."
+          , "           {8} 8."
+          , "           {9} 9."
+          , "           {10} 10."
+          , "           {11} 11."
+          , "           {12} 12."
+          , "           {13} 13."
+          , "           {14} 14."
+          , "           {15} 15."
+          , "           {16} 16."
+          ]
+        output = init $ unlines
+          [ "|-f Condition | 1 | 1. |"
+          , "  | 2 | 2. |"
+          , "  | 3 | 3. |"
+          , "  | 4 | 4. |"
+          , "  | 5 | 5. |"
+          , "  | 6 | 6. |"
+          , "  | 7 | 7. |"
+          , "  | 8 | 8. |"
+          , "  | 9 | 9. |"
+          , "  | 10 | 10. |"
+          , "  | 11 | 11. |"
+          , "  | 12 | 12. |"
+          , "  | 13 | 13. |"
+          , "  | 14 | 14. |"
+          , "  | 15 | 15. |"
+          , "|-1 [cont] | 16 | 16. |"
+          ]
+      convertScript input `shouldBeMarkup` output
+
     it "converts speech of various kinds together" $ do
       let
         input = unlines

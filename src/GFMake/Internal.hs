@@ -3,6 +3,9 @@ module GFMake.Internal where
 import Control.Applicative
   ( (<|>)
   )
+import Data.Char
+  ( intToDigit
+  )
 import Data.List
   ( intercalate
   )
@@ -16,11 +19,11 @@ import Text.Parsec
   , char
   , endOfLine
   , lookAhead
-  , notFollowedBy
   , many
   , many1
   , manyTill
   , noneOf
+  , notFollowedBy
   , oneOf
   , optionMaybe
   , parse
@@ -72,12 +75,15 @@ serializeElement (Header4 e)   = "\n====" ++ e ++ "===="
 serializeElement (Header5 e)   = "\n=====" ++ e ++ "====="
 serializeElement (Narration e) = "\n" ++ e
 serializeElement (Speech n s)  = "\n| " ++ n ++ " | " ++ s ++ " |"
-serializeElement (CondSpeech n cs) = "\n|" ++ rowSpan ++ " " ++ n ++ " " ++ pairs
+serializeElement (CondSpeech n cs) = concatMap format namedChunks
   where
-    rowSpan = if length cs == 1
-      then ""
-      else "-" ++ show (length cs)
-    pairs = intercalate "\n  " $ map (\(x, y) -> "| " ++ x ++ " | " ++ y ++ " |") cs
+    chunks = chunked 15 cs
+    namedChunks = if length chunks > 1
+      then (n, head chunks) : map (\cs' -> ("[cont]", cs')) (tail chunks)
+      else [(n, cs)]
+    rowSpan xs = ['-', intToDigit (length xs)]
+    pairs = intercalate "\n  " . map (\(x, y) -> "| " ++ x ++ " | " ++ y ++ " |")
+    format (n', cs') = "\n|" ++ rowSpan cs' ++ " " ++ n' ++ " " ++ pairs cs'
 serializeElement (Option l e)  = "\n*" ++ show l ++ ". " ++ e
 serializeElement OptionDelim   = "\n%"
 serializeElement Spacer        = "\n"
@@ -234,3 +240,9 @@ noOpRule :: Parser Element
 noOpRule = try $ do
   _ <- anyChar
   return NoOp
+
+chunked :: Int -> [a] -> [[a]]
+chunked _ [] = []
+chunked n xs = a : chunked n b
+  where
+    (a, b) = splitAt n xs

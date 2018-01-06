@@ -59,6 +59,22 @@ This is original narration for events. If it is long enough, then it is indented
 |-3 Condition | A | This is said under condition A. |
   | B | This is said under condition B. * - It may include narration as well. |
   | *C | Idiosyncratic marker. |
+|-f Long | 1 | GameFAQs |
+  | 2 | Markup |
+  | 3 | only |
+  | 4 | supports |
+  | 5 | rowspan |
+  | 6 | up |
+  | 7 | to |
+  | 8 | 15 |
+  | 9 | so |
+  | 10 | anything |
+  | 11 | more |
+  | 12 | must |
+  | 13 | be |
+  | 14 | in |
+  | 15 | separate |
+|-1 [cont] | 16 | tables. |
 %
 *1. Option 1
 | Speaker | This is the response to choosing one option. |
