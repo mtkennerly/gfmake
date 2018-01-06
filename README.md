@@ -56,7 +56,9 @@ This is original narration for events. If it is long enough, then it is indented
 | Narrated | * - Narration can occur inside of a speaker block. Speech occurs at normal indentation. * - Narration is indented an extra 2 spaces. |
 
 ====Header 4 Annotated | (an annotation will be present) / (in some rare cases) / (middle line is default, but all three are possible)====
-| Condition | {A} This is said under condition A. {B} This is said under condition B. * - It may include narration as well. *{C} Idiosyncratic marker. |
+|-3 Condition | A | This is said under condition A. |
+  | B | This is said under condition B. * - It may include narration as well. |
+  | *C | Idiosyncratic marker. |
 %
 *1. Option 1
 | Speaker | This is the response to choosing one option. |
@@ -85,11 +87,11 @@ This is original narration for events. If it is long enough, then it is indented
   enough header levels for them to work very well. It would be better to
   perform that cleanup automatically.
 
-* Nested narration, conditions, and options inside of a speech block should
-  be formatted specially, whereas now they end up all on one line in a jumble.
+* Narration and options nested inside of a speech block should be formatted
+  specially, whereas now they end up all on one line in a jumble.
 
 For nesting inside non-conditional speech, elements could simply be
-interspersed around said speech.
+interspersed around the speech:
 
 ```
 # Current:
@@ -101,19 +103,19 @@ Narration can occur inside of a speaker block.
 Narration is indented an extra 2 spaces.
 ```
 
-Conditional speech could be split into an additional table cell, but there is
-a complication when a condition contains its own nesting, since the GameFAQs
-Markup format does not support multiple lines within a cell.
+For conditional speech, there would need to be some way to still associate
+the nested element with its corresponding condition. Since GameFAQs Markup
+does not support multiple lines within a cell, this may require representing
+the narration within the same cell as speech:
 
 ```
 # Current:
-| Condition | {A} This is said under condition A. {B} This is said under condition B. * - It may include narration as well. *{C} Idiosyncratic marker. |
+|-3 Condition | A | This is said under condition A. |
+  | B | This is said under condition B. * - It may include narration as well. |
+  | *C | Idiosyncratic marker. |
 
 # Future?
-| Condition | {A} | This is said under condition A. |
-|| {B} | This is said under condition B. |
-It may include narration as well.
-|| *{C} | Idiosyncratic marker.
+|-3 Condition | A | This is said under condition A. |
+  | B | This is said under condition B. {'''It may include narration as well.'''} |
+  | *C | Idiosyncratic marker. |
 ```
-
-Care would be necessary to avoid introducing ambiguity in the conversion.

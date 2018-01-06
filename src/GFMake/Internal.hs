@@ -16,6 +16,7 @@ import Text.Parsec
   , char
   , endOfLine
   , lookAhead
+  , notFollowedBy
   , many
   , many1
   , manyTill
@@ -35,6 +36,7 @@ import Text.Parsec.String
 data Element
   = Narration String
   | Speech String String  -- ^ Speaker name, then spoken words.
+  | CondSpeech String [(String, String)]  -- ^ Name, condition descriptor, spoken words
   | Header2 String
   | Header3 String
   | Header3B String
@@ -70,6 +72,12 @@ serializeElement (Header4 e)   = "\n====" ++ e ++ "===="
 serializeElement (Header5 e)   = "\n=====" ++ e ++ "====="
 serializeElement (Narration e) = "\n" ++ e
 serializeElement (Speech n s)  = "\n| " ++ n ++ " | " ++ s ++ " |"
+serializeElement (CondSpeech n cs) = "\n|" ++ rowSpan ++ " " ++ n ++ " " ++ pairs
+  where
+    rowSpan = if length cs == 1
+      then ""
+      else "-" ++ show (length cs)
+    pairs = intercalate "\n  " $ map (\(x, y) -> "| " ++ x ++ " | " ++ y ++ " |") cs
 serializeElement (Option l e)  = "\n*" ++ show l ++ ". " ++ e
 serializeElement OptionDelim   = "\n%"
 serializeElement Spacer        = "\n"
@@ -118,6 +126,7 @@ elemsRule = many $
   <|> optionDelimRule
   <|> optionRule
   <|> narrationRule
+  <|> condSpeechRule
   <|> speechRule
   <|> commentRule
   <|> noOpRule
@@ -196,6 +205,23 @@ speechRule = try $ do
   _ <- char ':'
   spoken <- sepBy (many1 (noneOf "\r\n")) (try $ many1 endOfLine >> string "      " >> many (char ' '))
   return $ Speech (strip name) (unwords $ map strip spoken)
+
+condSpeechRule :: Parser Element
+condSpeechRule = try $ do
+  name <- many1 $ noneOf ":\n\r"
+  _ <- char ':'
+  pairs <- many1 $ do
+    cond <- try $ do
+      _ <- spaces
+      special <- optionMaybe $ char '*'
+      _ <- char '{'
+      label <- manyTill anyChar (char '}')
+      return $ case special of
+        Just s  -> s : strip label
+        Nothing -> strip label
+    spoken <- sepBy (many1 (noneOf "\r\n")) (try $ many1 endOfLine >> string "      " >> spaces >> notFollowedBy (string "*{" <|> string "{"))
+    return (cond, unwords $ map strip spoken)
+  return $ CondSpeech (strip name) pairs
 
 commentRule :: Parser Element
 commentRule = try $ do

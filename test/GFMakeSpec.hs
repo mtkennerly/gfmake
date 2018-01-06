@@ -81,32 +81,6 @@ h4AnnoLow = unlines
 
 h5 = "\n   [ Header 5 ]"
 
-options = unlines
-  [ "-----------------------------------------------------------"
-  , "     -(1a)"
-  , "A         : Foo."
-  , ""
-  , "======(12a)"
-  , "B         : Bar."
-  , ""
-  , "     -(1b)"
-  , "C         : Baz."
-  , "-----------------------------------------------------------"
-  ]
-
-optionsOutput = init $ unlines
-  [ "%"
-  , "*1. 1a"
-  , "| A | Foo. |"
-  , ""
-  , "*12. 12a"
-  , "| B | Bar. |"
-  , ""
-  , "*1. 1b"
-  , "| C | Baz. |"
-  , "%"
-  ]
-
 spec :: Spec
 spec =
   describe "convertScript" $ do
@@ -134,6 +108,57 @@ spec =
         `shouldBeMarkup` "| Foo | Bar. * - Example. Baz. |"
     it "converts speech before narration" $
       convertScript "S         : W.\n* - N." `shouldBeMarkup` "| S | W. |\n\nN."
+
+    it "converts speech with one condition" $
+      convertScript "S         :{A} Foo." `shouldBeMarkup` "| S | A | Foo. |"
+    it "converts speech with one condition containing braces" $
+      convertScript "S         :{A} F{o}o." `shouldBeMarkup` "| S | A | F{o}o. |"
+    it "converts speech with one condition over multiple lines" $
+      convertScript "S         :{A} Foo,\n               bar." `shouldBeMarkup` "| S | A | Foo, bar. |"
+    it "converts speech with one condition and a special marker" $
+      convertScript "S         :*{A} Foo." `shouldBeMarkup` "| S | *A | Foo. |"
+    it "converts speech with many conditions" $
+      convertScript "S         :{A} Foo.\n           {B} Bar." `shouldBeMarkup` "|-2 S | A | Foo. |\n  | B | Bar. |"
+    it "converts speech with many conditions over multiple lines" $ do
+      let
+        input = unlines
+          [ "Condition :{A} Case A."
+          , "           {B} Case B,"
+          , "               which contains multiple lines."
+          , "          *{C} Case C."
+          ]
+        output = init $ unlines
+          [ "|-3 Condition | A | Case A. |"
+          , "  | B | Case B, which contains multiple lines. |"
+          , "  | *C | Case C. |"
+          ]
+      convertScript input `shouldBeMarkup` output
+    it "converts speech of various kinds together" $ do
+      let
+        input = unlines
+          [ "Simple    : Just one line."
+          , ""
+          , "Multiple  : This speech contains"
+          , "            multiple lines."
+          , ""
+          , "            It also contains empty lines."
+          , ""
+          , "Condition :{A} Case A."
+          , "           {B} Case B,"
+          , "               which contains multiple lines."
+          , "           {C} Case C."
+          , ""
+          , "Simple 2  : One more line."
+          ]
+        output = init $ unlines
+          [ "| Simple | Just one line. |"
+          , "| Multiple | This speech contains multiple lines. It also contains empty lines. |"
+          , "|-3 Condition | A | Case A. |"
+          , "  | B | Case B, which contains multiple lines. |"
+          , "  | C | Case C. |"
+          , "| Simple 2 | One more line. |"
+          ]
+      convertScript input `shouldBeMarkup` output
 
     it "converts h2" $
       convertScript h2 `shouldBeMarkup` "==Header 2=="
@@ -184,8 +209,33 @@ spec =
     it "converts h5 after a non-header element" $
       convertScript ("* - Example.\n\n" ++ h5) `shouldBeMarkup` "Example.\n\n=====Header 5====="
 
-    it "converts option blocks" $
-      convertScript options `shouldBeMarkup` optionsOutput
+    it "converts option blocks" $ do
+      let
+        input = unlines
+          [ "-----------------------------------------------------------"
+          , "     -(1a)"
+          , "A         : Foo."
+          , ""
+          , "======(12a)"
+          , "B         : Bar."
+          , ""
+          , "     -(1b)"
+          , "C         : Baz."
+          , "-----------------------------------------------------------"
+          ]
+        output = init $ unlines
+          [ "%"
+          , "*1. 1a"
+          , "| A | Foo. |"
+          , ""
+          , "*12. 12a"
+          , "| B | Bar. |"
+          , ""
+          , "*1. 1b"
+          , "| C | Baz. |"
+          , "%"
+          ]
+      convertScript input `shouldBeMarkup` output
     it "converts option delimiters" $
       convertScript (replicate 59 '-') `shouldBeMarkup` "%"
     it "converts options at level 1" $
