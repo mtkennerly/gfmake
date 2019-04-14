@@ -94,6 +94,8 @@ spec =
       convertScript "* - Hello: there." `shouldBeMarkup` "Hello: there."
     it "converts narration before speech" $
       convertScript "* - N.\nS         : W." `shouldBeMarkup` "N.\n\n| S | W. |"
+    it "converts narration before conditional speech" $
+      convertScript "* - N.\nS         :{1} W." `shouldBeMarkup` "N.\n\n|-1 S | 1 | W. |"
 
     it "converts speech with one line" $
       convertScript "Foo       : Bar." `shouldBeMarkup` "| Foo | Bar. |"
@@ -108,6 +110,8 @@ spec =
         `shouldBeMarkup` "| Foo | Bar. * - Example. Baz. |"
     it "converts speech before narration" $
       convertScript "S         : W.\n* - N." `shouldBeMarkup` "| S | W. |\n\nN."
+    it "converts conditional speech before narration" $
+      convertScript "S         :{1} W.\n* - N." `shouldBeMarkup` "|-1 S | 1 | W. |\n\nN."
 
     it "converts speech with one condition" $
       convertScript "S         :{A} Foo." `shouldBeMarkup` "|-1 S | A | Foo. |"

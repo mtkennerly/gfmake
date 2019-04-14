@@ -58,6 +58,8 @@ padElements []                            = []
 padElements [x]                           = [x]
 padElements (Narration x:Speech sx sy:xs) = Narration x : Spacer : padElements (Speech sx sy : xs)
 padElements (Speech sx sy:Narration y:xs) = Speech sx sy : Spacer : padElements (Narration y : xs)
+padElements (Narration x:CondSpeech sx sy:xs) = Narration x : Spacer : padElements (CondSpeech sx sy : xs)
+padElements (CondSpeech sx sy:Narration y:xs) = CondSpeech sx sy : Spacer : padElements (Narration y : xs)
 padElements (OptionDelim:Option l o:xs)   = OptionDelim : padElements (Option l o : xs)
 padElements (x:Option l o:xs)             = x : Spacer : padElements (Option l o : xs)
 padElements (x:y:xs)
