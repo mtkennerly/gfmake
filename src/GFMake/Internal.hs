@@ -77,6 +77,7 @@ serializeElement (Header4 e)   = "\n====" ++ e ++ "===="
 serializeElement (Header5 e)   = "\n=====" ++ e ++ "====="
 serializeElement (Narration e) = "\n" ++ e
 serializeElement (Speech n s)  = "\n| " ++ n ++ " | " ++ s ++ " |"
+serializeElement (CondSpeech _ []) = ""
 serializeElement (CondSpeech n cs) = concatMap format namedChunks
   where
     chunks = chunked 15 cs
@@ -84,8 +85,12 @@ serializeElement (CondSpeech n cs) = concatMap format namedChunks
       then (n, head chunks) : map (\cs' -> ("[cont]", cs')) (tail chunks)
       else [(n, cs)]
     rowSpan xs = ['-', intToDigit (length xs)]
-    pairs = intercalate "\n  " . map (\(x, y) -> "| " ++ x ++ " | " ++ y ++ " |")
-    format (n', cs') = "\n|" ++ rowSpan cs' ++ " " ++ n' ++ " " ++ pairs cs'
+    pairs = intercalate "\n" . map (\(x, y) -> "|   " ++ x ++ " | " ++ y ++ " |")
+    format (n', cs') =
+      -- First line.
+      "\n|" ++ rowSpan cs' ++ " " ++ n' ++ " | " ++ fst (head cs') ++ " | " ++ snd (head cs') ++ " |"
+      -- Remaining lines.
+      ++ (if length cs' > 1 then "\n" else "") ++ pairs (tail cs')
 serializeElement (Option l e)  = "\n*" ++ show l ++ ". " ++ e
 serializeElement OptionDelim   = "\n%"
 serializeElement Spacer        = "\n"

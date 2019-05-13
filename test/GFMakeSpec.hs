@@ -122,7 +122,7 @@ spec =
     it "converts speech with one condition and a special marker" $
       convertScript "S         :*{A} Foo." `shouldBeMarkup` "|-1 S | *A | Foo. |"
     it "converts speech with many conditions" $
-      convertScript "S         :{A} Foo.\n           {B} Bar." `shouldBeMarkup` "|-2 S | A | Foo. |\n  | B | Bar. |"
+      convertScript "S         :{A} Foo.\n           {B} Bar." `shouldBeMarkup` "|-2 S | A | Foo. |\n|   B | Bar. |"
     it "converts speech with many conditions over multiple lines" $ do
       let
         input = unlines
@@ -133,8 +133,8 @@ spec =
           ]
         output = init $ unlines
           [ "|-3 Condition | A | Case A. |"
-          , "  | B | Case B, which contains multiple lines. |"
-          , "  | *C | Case C. |"
+          , "|   B | Case B, which contains multiple lines. |"
+          , "|   *C | Case C. |"
           ]
       convertScript input `shouldBeMarkup` output
     it "converts speech with 10 conditions using hexadecimal" $ do
@@ -153,15 +153,15 @@ spec =
           ]
         output = init $ unlines
           [ "|-a Condition | 1 | 1. |"
-          , "  | 2 | 2. |"
-          , "  | 3 | 3. |"
-          , "  | 4 | 4. |"
-          , "  | 5 | 5. |"
-          , "  | 6 | 6. |"
-          , "  | 7 | 7. |"
-          , "  | 8 | 8. |"
-          , "  | 9 | 9. |"
-          , "  | 10 | 10. |"
+          , "|   2 | 2. |"
+          , "|   3 | 3. |"
+          , "|   4 | 4. |"
+          , "|   5 | 5. |"
+          , "|   6 | 6. |"
+          , "|   7 | 7. |"
+          , "|   8 | 8. |"
+          , "|   9 | 9. |"
+          , "|   10 | 10. |"
           ]
       convertScript input `shouldBeMarkup` output
     it "converts speech with 16 conditions by spliting into multiple elements" $ do
@@ -186,20 +186,20 @@ spec =
           ]
         output = init $ unlines
           [ "|-f Condition | 1 | 1. |"
-          , "  | 2 | 2. |"
-          , "  | 3 | 3. |"
-          , "  | 4 | 4. |"
-          , "  | 5 | 5. |"
-          , "  | 6 | 6. |"
-          , "  | 7 | 7. |"
-          , "  | 8 | 8. |"
-          , "  | 9 | 9. |"
-          , "  | 10 | 10. |"
-          , "  | 11 | 11. |"
-          , "  | 12 | 12. |"
-          , "  | 13 | 13. |"
-          , "  | 14 | 14. |"
-          , "  | 15 | 15. |"
+          , "|   2 | 2. |"
+          , "|   3 | 3. |"
+          , "|   4 | 4. |"
+          , "|   5 | 5. |"
+          , "|   6 | 6. |"
+          , "|   7 | 7. |"
+          , "|   8 | 8. |"
+          , "|   9 | 9. |"
+          , "|   10 | 10. |"
+          , "|   11 | 11. |"
+          , "|   12 | 12. |"
+          , "|   13 | 13. |"
+          , "|   14 | 14. |"
+          , "|   15 | 15. |"
           , "|-1 [cont] | 16 | 16. |"
           ]
       convertScript input `shouldBeMarkup` output
@@ -225,8 +225,8 @@ spec =
           [ "| Simple | Just one line. |"
           , "| Multiple | This speech contains multiple lines. It also contains empty lines. |"
           , "|-3 Condition | A | Case A. |"
-          , "  | B | Case B, which contains multiple lines. |"
-          , "  | C | Case C. |"
+          , "|   B | Case B, which contains multiple lines. |"
+          , "|   C | Case C. |"
           , "| Simple 2 | One more line. |"
           ]
       convertScript input `shouldBeMarkup` output
