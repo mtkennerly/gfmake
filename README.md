@@ -75,25 +75,26 @@ This is original narration for events. If it is long enough, then it is indented
 |   14 | in |
 |   15 | separate |
 |-1 [cont] | 16 | tables. |
-%
-*1. Option 1
+
+=--Option 1--=
 | Speaker | This is the response to choosing one option. |
-
-*2. Option 1.1
+=--Option 1.1--=
 | Speaker | This option is available if you choose Option 1. |
-
-*6. Six
+=--Six--=
 | Speaker | The hyphens continue increasing... |
-
-*7. Seven
+=--Seven--=
 | Speaker | ...until they wrap around to an equal sign. |
-
-*12. Twelve
+=--Twelve--=
 | Speaker | The maximum depth is 12 nested options. |
+=-=
+=-=
+=-=
+=-=
+=-=
 
-*1. Option 2
+=--Option 2--=
 | Speaker | This is the alternative to Option 1. |
-%
+=-=
 ```
 
 ## To-do

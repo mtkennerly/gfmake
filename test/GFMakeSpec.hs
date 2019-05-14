@@ -287,7 +287,7 @@ spec =
           , "     -(1a)"
           , "A         : Foo."
           , ""
-          , "======(12a)"
+          , "    --(2a)"
           , "B         : Bar."
           , ""
           , "     -(1b)"
@@ -295,20 +295,18 @@ spec =
           , "-----------------------------------------------------------"
           ]
         output = init $ unlines
-          [ "%"
-          , "*1. 1a"
+          [ "=--1a--="
           , "| A | Foo. |"
-          , ""
-          , "*12. 12a"
+          , "=--2a--="
           , "| B | Bar. |"
+          , "=-="
+          , "=-="
           , ""
-          , "*1. 1b"
+          , "=--1b--="
           , "| C | Baz. |"
-          , "%"
+          , "=-="
           ]
       convertScript input `shouldBeMarkup` output
-    it "converts option delimiters" $
-      convertScript (replicate 59 '-') `shouldBeMarkup` "%"
     it "converts options at level 1" $
       convertScript "     -(A)" `shouldBeMarkup` "*1. A"
     it "converts options at level 2" $

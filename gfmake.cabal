@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 3714e33bfe3a5a8b9baac44c2e8bbe56170c85ad48f1a1ae2ce5638d908a5b0c
+-- hash: b2ee02e54d5f1c649d45b9e41bf32c5b5a3ae898609f06c067a6ff190ad6890e
 
 name:           gfmake
 version:        1.0.0
@@ -28,10 +28,11 @@ source-repository head
 library
   hs-source-dirs:
       src
-  ghc-options: -Wall
+  ghc-options: -Wall -fno-warn-type-defaults
   build-depends:
       base <5.0
     , parsec
+    , split
   exposed-modules:
       GFMake
       GFMake.Internal
@@ -51,6 +52,7 @@ executable gfmake
     , gfmake
     , optparse-applicative
     , parsec
+    , split
   default-language: Haskell2010
 
 test-suite spec
@@ -64,7 +66,9 @@ test-suite spec
     , gfmake
     , hspec
     , parsec
+    , split
   other-modules:
       GFMakeSpec
+      GFMakeSpec.InternalSpec
       Paths_gfmake
   default-language: Haskell2010

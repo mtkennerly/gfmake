@@ -17,10 +17,11 @@ github: mtkennerly/gfmake
 dependencies:
   - base < 5.0  # >= 4.5.0
   - parsec  # == 3.*
+  - split
 
 library:
   source-dirs: src
-  ghc-options: -Wall
+  ghc-options: -Wall -fno-warn-type-defaults
 
 executables:
   gfmake:

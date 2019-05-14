@@ -8,6 +8,10 @@ import Data.Char
   )
 import Data.List
   ( intercalate
+  , groupBy
+  )
+import Data.List.Split
+  ( splitOn
   )
 import Data.Maybe
   ( catMaybes
@@ -47,6 +51,7 @@ data Element
   | Header5 String
   | Option Int String  -- ^ Nesting level, then option phrase.
   | OptionDelim
+  | OptionSet String [Element]  -- ^ Option phrase, contained elements
   | Spacer
   | MarkupFlag
   | Comment String
@@ -62,9 +67,34 @@ padElements (Narration x:CondSpeech sx sy:xs) = Narration x : Spacer : padElemen
 padElements (CondSpeech sx sy:Narration y:xs) = CondSpeech sx sy : Spacer : padElements (Narration y : xs)
 padElements (OptionDelim:Option l o:xs)   = OptionDelim : padElements (Option l o : xs)
 padElements (x:Option l o:xs)             = x : Spacer : padElements (Option l o : xs)
+padElements (OptionSet o1 os1:OptionSet o2 os2:xs) = OptionSet o1 os1 : Spacer : padElements (OptionSet o2 os2 : xs)
+padElements (Narration x:OptionSet o os:xs) = Narration x : Spacer : padElements (OptionSet o os : xs)
+padElements (Speech x y:OptionSet o os:xs) = Speech x y : Spacer : padElements (OptionSet o os : xs)
+padElements (CondSpeech x y:OptionSet o os:xs) = CondSpeech x y : Spacer : padElements (OptionSet o os : xs)
 padElements (x:y:xs)
   | not (isHeader x) && isHeader y = x : Spacer : padElements (y : xs)
   | otherwise                      = x : padElements (y : xs)
+
+constructOptionSets :: [Element] -> [Element]
+constructOptionSets [] = []
+constructOptionSets xs = concat [if odd n then group else makeSets 1 group | (n, group) <- zip [1..] groups]
+  where
+    groups :: [[Element]]
+    groups = splitOn [OptionDelim] xs
+
+    makeSets :: Int -> [Element] -> [Element]
+    makeSets _ [] = []
+    makeSets level group = do
+      let byLevel = groupBy (\x y -> not (isOption level y)) group
+      concatMap (makeSet level) byLevel
+
+    makeSet :: Int -> [Element] -> [Element]
+    makeSet _ [] = []
+    makeSet _ [x] = [x]
+    makeSet level (Option l e : group)
+      | level == l = [OptionSet e (makeSets (level + 1) group)]
+      | otherwise = makeSets (level + 1) (Option l e : group)
+    makeSet level (x:y) = x : makeSet level y
 
 serializeElements :: [Element] -> String
 serializeElements = concatMap serializeElement
@@ -92,7 +122,8 @@ serializeElement (CondSpeech n cs) = concatMap format namedChunks
       -- Remaining lines.
       ++ (if length cs' > 1 then "\n" else "") ++ pairs (tail cs')
 serializeElement (Option l e)  = "\n*" ++ show l ++ ". " ++ e
-serializeElement OptionDelim   = "\n%"
+serializeElement OptionDelim   = ""
+serializeElement (OptionSet x xs) = "\n=--" ++ x ++ "--=" ++ serializeElements xs ++ "\n=-="
 serializeElement Spacer        = "\n"
 serializeElement MarkupFlag    = ";format:gf-markup\n"
 serializeElement (Comment e)   = "\n; " ++ e
@@ -118,6 +149,10 @@ isHeader (Header3B _) = True
 isHeader (Header4 _)  = True
 isHeader (Header5 _)  = True
 isHeader _            = False
+
+isOption :: Int -> Element -> Bool
+isOption level (Option l _) = level == l
+isOption _ _ = False
 
 strip :: String -> String
 strip = reverse . lstrip . reverse . lstrip
