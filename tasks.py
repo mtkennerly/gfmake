@@ -11,7 +11,7 @@ def help(ctx):
 
 @task
 def sample1(ctx):
-    ctx.run("stack build && stack exec -- gfmake sample1.txt")
+    ctx.run("stack build && stack exec -- gfmake sample1.gfm.txt")
 
 
 @task

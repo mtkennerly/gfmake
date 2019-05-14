@@ -10,7 +10,7 @@ From the console:
 ```
 stack build
 stack exec -- gfmake --help
-stack exec -- gfmake sample1.txt
+stack exec -- gfmake sample1.gfm.txt
 
 stack install
 gfmake --help
@@ -24,7 +24,7 @@ module Main where
 import GFMake (convertScript)
 
 main :: IO ()
-main = readFile "sample1.txt" >>= (return . convertScript) >>= putStrLn
+main = readFile "sample1.gfm.txt" >>= (return . convertScript) >>= putStrLn
 ```
 
 ## Versioning
@@ -36,7 +36,7 @@ imports at your discretion.
 
 ## Sample
 
-This is the output for sample1.txt:
+This is the output for sample1.gfm.txt:
 
 ```
 ;format:gf-markup
@@ -57,23 +57,23 @@ This is original narration for events. If it is long enough, then it is indented
 
 ====Header 4 Annotated | (an annotation will be present) / (in some rare cases) / (middle line is default, but all three are possible)====
 |-3 Condition | A | This is said under condition A. |
-  | B | This is said under condition B. * - It may include narration as well. |
-  | *C | Idiosyncratic marker. |
+|   B | This is said under condition B. * - It may include narration as well. |
+|   *C | Idiosyncratic marker. |
 |-f Long | 1 | GameFAQs |
-  | 2 | Markup |
-  | 3 | only |
-  | 4 | supports |
-  | 5 | rowspan |
-  | 6 | up |
-  | 7 | to |
-  | 8 | 15 |
-  | 9 | so |
-  | 10 | anything |
-  | 11 | more |
-  | 12 | must |
-  | 13 | be |
-  | 14 | in |
-  | 15 | separate |
+|   2 | Markup |
+|   3 | only |
+|   4 | supports |
+|   5 | rowspan |
+|   6 | up |
+|   7 | to |
+|   8 | 15 |
+|   9 | so |
+|   10 | anything |
+|   11 | more |
+|   12 | must |
+|   13 | be |
+|   14 | in |
+|   15 | separate |
 |-1 [cont] | 16 | tables. |
 %
 *1. Option 1

@@ -82,7 +82,7 @@ serializeElement (CondSpeech n cs) = concatMap format namedChunks
   where
     chunks = chunked 15 cs
     namedChunks = if length chunks > 1
-      then (n, head chunks) : map (\cs' -> ("[cont]", cs')) (tail chunks)
+      then (n, head chunks) : map ((,) "[cont]") (tail chunks)
       else [(n, cs)]
     rowSpan xs = ['-', intToDigit (length xs)]
     pairs = intercalate "\n" . map (\(x, y) -> "|   " ++ x ++ " | " ++ y ++ " |")
@@ -238,8 +238,8 @@ condSpeechRule = try $ do
 
 commentRule :: Parser Element
 commentRule = try $ do
-  _ <- many endOfLine >> lookAhead (noneOf " ")
-  t <- many1 $ noneOf "\r\n*#$-_=:"
+  _ <- many endOfLine >> lookAhead (noneOf " #$*-=:")
+  t <- many1 $ noneOf "\r\n*#$_=:"
   _ <- endOfLine
   return $ Comment $ strip t
 

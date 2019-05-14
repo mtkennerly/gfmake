@@ -343,7 +343,7 @@ spec =
     it "converts comments between other elements" $
       convertScript "* - One.\nTwo.\n* - Three." `shouldBeMarkup` "One.\n; Two.\nThree."
     it "trims would-be comments through the last special character" $
-      convertScript "* - One.\nWould-be\n* - Two." `shouldBeMarkup` "One.\n; be\nTwo."
+      convertScript "* - One.\nWo#u$ld-be\n* - Two." `shouldBeMarkup` "One.\n; ld-be\nTwo."
 
     it "handles empty files" $
       convertScript "" `shouldBe` ";format:gf-markup\n"
